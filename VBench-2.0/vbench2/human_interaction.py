@@ -109,7 +109,12 @@ def load_video(video_path, max_frames_num,fps=1,force_sample=False):
         frame_idx = uniform_sampled_frames.tolist()
         frame_time = [i/vr.get_avg_fps() for i in frame_idx]
     frame_time = ",".join([f"{i:.2f}s" for i in frame_time])
-    spare_frames = vr.get_batch(frame_idx).asnumpy()
+    #spare_frames = vr.get_batch(frame_idx).asnumpy()
+    batch = vr.get_batch(frame_idx)
+    if hasattr(batch, "asnumpy"):
+        spare_frames = batch.asnumpy()
+    else:
+        spare_frames = batch.numpy()
     return spare_frames,frame_time,video_time
 
 def LLaVA_Video(prompt_dict_ls, llava_model, llava_tokenizer, image_processor, qwen_model, qwen_tokenizer, device):
@@ -126,7 +131,8 @@ def LLaVA_Video(prompt_dict_ls, llava_model, llava_tokenizer, image_processor, q
             }
             max_frames_num = 64
             video,frame_time,video_time = load_video(video_path, max_frames_num, 1, force_sample=True)
-            video = image_processor.preprocess(video, return_tensors="pt")["pixel_values"].cuda().bfloat16()
+            #video = image_processor.preprocess(video, return_tensors="pt")["pixel_values"].cuda().bfloat16()
+            video = image_processor.preprocess(video, return_tensors="pt")["pixel_values"].to(device=device, dtype=torch.bfloat16)
             video = [video]
             conv_template = "qwen_1_5"  # Make sure you use correct chat template for different models
             answer_llavas=[]
@@ -197,7 +203,7 @@ def compute_human_interaction(json_dir, device, submodules_dict, **kwargs):
         qwen_model = AutoModelForCausalLM.from_pretrained(
             qwen_model_name,
             torch_dtype="auto",
-            device_map="auto",
+            device_map=device_map,
             cache_dir=submodules_dict['qwen']
         )
         qwen_tokenizer = AutoTokenizer.from_pretrained(qwen_model_name, cache_dir=submodules_dict['qwen'])
@@ -206,7 +212,7 @@ def compute_human_interaction(json_dir, device, submodules_dict, **kwargs):
         qwen_model = AutoModelForCausalLM.from_pretrained(
             qwen_model_name,
             torch_dtype="auto",
-            device_map="auto",
+            device_map=device_map,
             cache_dir=submodules_dict['qwen']
         )
         qwen_tokenizer = AutoTokenizer.from_pretrained(qwen_model_name, cache_dir=submodules_dict['qwen'])

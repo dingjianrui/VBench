@@ -141,7 +141,7 @@ def evaluate_id_consistency(prompt_dict_ls, retina_model, model):
 def compute_human_identity(json_dir, device, submodules_dict, **kwargs):
     _, prompt_dict_ls = load_dimension_info(json_dir, dimension='human_identity', lang='en')
     
-    url="https://github.com/ternaus/retinaface/releases/download/0.01/retinaface_resnet50_2020-07-20-f168fae3c.zip"
+    url="https://tos-sandbox-bj.tos-cn-beijing.volces.com/models/retinaface/retinaface_resnet50_2020-07-20-f168fae3c.zip"
     retina_state_dict = model_zoo.load_url(url, progress=True, map_location="cpu")
     retina_model = Model(max_size=2048, device=device)
     retina_model.load_state_dict(retina_state_dict)

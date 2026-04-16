@@ -31,7 +31,7 @@ def parse_args():
     parser.add_argument(
         "--dimension",
         nargs='+',
-        required=True,
+        required=False,
         help="list of evaluation dimensions, usage: --dimension <dim_1> <dim_2>",
     )
     parser.add_argument(

@@ -17,7 +17,7 @@ weight_decay = 0.05 / 2
 train_batch_size_per_gpu = 16
 text_model_name = '../pretrained_models/clip-vit-base-patch32-projection'
 # text_model_name = 'openai/clip-vit-base-patch32'
-text_model_name = '/mnt/petrelfs/zhengdian/code/ckpt/clip-vit-base-patch32'
+text_model_name = '/data/openai/clip-vit-base-patch32'
 
 # scaling model from X to XL
 deepen_factor = 1.0

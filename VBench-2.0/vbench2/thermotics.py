@@ -43,7 +43,12 @@ def load_video(video_path, max_frames_num,fps=1,force_sample=False):
         frame_idx = uniform_sampled_frames.tolist()
         frame_time = [i/vr.get_avg_fps() for i in frame_idx]
     frame_time = ",".join([f"{i:.2f}s" for i in frame_time])
-    spare_frames = vr.get_batch(frame_idx).asnumpy()
+    #spare_frames = vr.get_batch(frame_idx).asnumpy()
+    batch = vr.get_batch(frame_idx)
+    if hasattr(batch, "asnumpy"):
+        spare_frames = batch.asnumpy()
+    else:
+        spare_frames = batch.numpy()
     return spare_frames,frame_time,video_time
 
 def LLaVA_Video(prompt_dict_ls, model, tokenizer, image_processor, device):
@@ -58,7 +63,7 @@ def LLaVA_Video(prompt_dict_ls, model, tokenizer, image_processor, device):
         
             max_frames_num = 64
             video,frame_time,video_time = load_video(video_path, max_frames_num, 1, force_sample=True)
-            video = image_processor.preprocess(video, return_tensors="pt")["pixel_values"].cuda().bfloat16()
+            video = image_processor.preprocess(video, return_tensors="pt")["pixel_values"].to(device).bfloat16()
             video = [video]
             conv_template = "qwen_1_5"  # Make sure you use correct chat template for different models
             time_instruciton = f"The video lasts for {video_time:.2f} seconds, and {len(video[0])} frames are uniformly sampled from it. These frames are located at {frame_time}. You will not care about the name correctness in question. Please answer yes or no only for the following questions"
